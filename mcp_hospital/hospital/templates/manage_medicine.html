@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if medicine %}Update{% else %}Add{% endif %} Medicine - AVM Hospital{% endblock %}
+{% block page_title %}{% if medicine %}Update Medicine{% else %}Add New Inventory{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .inventory-form-card {
+        background: white;
+        border-radius: 24px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .form-header-banner {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .form-body-padding {
+        padding: 40px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        transition: var(--transition);
+        background-color: #f8fafc;
+    }
+
+    .form-control:focus {
+        border-color: #0ea5e9;
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    }
+
+    .inventory-icon-box {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="inventory-form-card">
+        <div class="form-header-banner">
+            <div class="inventory-icon-box">
+                <i class="bi bi-box-seam fs-2"></i>
+            </div>
+            <h2 class="fw-bold mb-1">{% if medicine %}Update Stock{% else %}New Inventory Entry{% endif %}</h2>
+            <p class="mb-0 opacity-75">Maintain accurate records for pharmacy supplies and medicine tracking.</p>
+        </div>
+
+        <div class="form-body-padding">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row g-4">
+                    <!-- Medicine Name -->
+                    <div class="col-12">
+                        <label class="form-label">Medicine Full Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ medicine.name|default:'' }}"
+                            placeholder="e.g. Amoxicillin 500mg" required>
+                    </div>
+
+                    <!-- Stock Count and Manufacturer -->
+                    <div class="col-md-6">
+                        <label class="form-label">Initial/Updated Stock Count</label>
+                        <input type="number" name="count" class="form-control" value="{{ medicine.count|default:'0' }}"
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Pharmaceutical Company</label>
+                        <input type="text" name="company_name" class="form-control"
+                            value="{{ medicine.company_name|default:'' }}" placeholder="e.g. Pfizer Inc." required>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="col-md-6">
+                        <label class="form-label">Manufacture Date</label>
+                        <input type="date" name="manufacture_date" class="form-control"
+                            value="{{ medicine.manufacture_date|date:'Y-m-d' }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="date" name="expiry_date" class="form-control"
+                            value="{{ medicine.expiry_date|date:'Y-m-d' }}" required>
+                    </div>
+
+                    <!-- Storage Location -->
+                    <div class="col-12">
+                        <label class="form-label">Storage Location / Shelf ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-2 border-end-0"
+                                style="border-radius: 12px 0 0 12px;"><i class="bi bi-geo-alt text-primary"></i></span>
+                            <input type="text" name="storage_block" class="form-control border-start-0"
+                                style="border-radius: 0 12px 12px 0;" value="{{ medicine.storage_block|default:'' }}"
+                                placeholder="e.g. Section B, Shelf 4" required>
+                        </div>
+                    </div>
+
+                    <!-- Submit Actions -->
+                    <div class="col-12 mt-5">
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-premium py-3 fs-5 fw-bold">
+                                <i class="bi bi-check2-circle me-2"></i> {% if medicine %}
+                                Save Changes
+                                {% else %}
+                                Register Inventory
+                                {% endif %}
+                            </button>
+                            <a href="{% url 'pharmacy_dashboard' %}"
+                                class="btn btn-light btn-premium py-3 fw-bold text-muted">
+                                Cancel & Return to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

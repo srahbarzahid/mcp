@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - AVM Hospital{% endblock %}
+{% block page_title %}System Administration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        transition: var(--transition);
+    }
+
+    .admin-stat-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .status-badge.pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.confirmed {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.completed {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.cancelled {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-5">
+    <!-- Admin Quick Actions -->
+    <div class="col-lg-12">
+        <div class="card-custom bg-white p-4 border-0 shadow-sm">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h3 class="fw-bold mb-1 text-dark">Administrative Control</h3>
+                    <p class="text-muted mb-0">Oversee hospital operations, manage billing, and monitor system health.
+                    </p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/admin/" target="_blank" class="btn btn-dark btn-premium">
+                        <i class="bi bi-shield-lock me-2"></i> Django Admin
+                    </a>
+                    <a href="{% url 'view_bills' %}" class="btn btn-warning btn-premium text-white">
+                        <i class="bi bi-receipt me-2"></i> Billing System
+                    </a>
+                    <a href="{% url 'ward_status' %}" class="btn btn-success btn-premium">
+                        <i class="bi bi-building-gear me-2"></i> Ward Mgmt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-md-4">
+        <div class="admin-stat-card">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-circle bg-primary-subtle text-primary">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <div class="ms-3">
+                    <h4 class="fw-bold mb-0">{{ appointments|length }}</h4>
+                    <p class="text-muted small mb-0">Total Appointments</p>
+                </div>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-primary" style="width: 70%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="admin-stat-card">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-circle bg-success-subtle text-success">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="ms-3">
+                    <h4 class="fw-bold mb-0">Active</h4>
+                    <p class="text-muted small mb-0">Staff & Staff Tracking</p>
+                </div>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-success" style="width: 85%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="admin-stat-card">
+            <div class="d-flex align-items-center mb-3">
+                <div class="icon-circle bg-info-subtle text-info">
+                    <i class="bi bi-activity"></i>
+                </div>
+                <div class="ms-3">
+                    <h4 class="fw-bold mb-0">98%</h4>
+                    <p class="text-muted small mb-0">System Capacity</p>
+                </div>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-info" style="width: 98%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-custom shadow-sm border-0 bg-white">
+            <div class="card-header-custom bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0 text-dark">Global Appointment Ledger</h5>
+            </div>
+            <div class="card-body p-0 mt-3">
+                <div class="table-responsive">
+                    {% if appointments %}
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 text-uppercase small fw-bold text-muted border-0">Schedule</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Patient</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Consultant</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Status</th>
+                                <th class="pe-4 text-end text-uppercase small fw-bold text-muted border-0">Registry</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in appointments %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ appt.time }}</div>
+                                    <small class="text-muted">{{ appt.date }}</small>
+                                </td>
+                                <td>
+                                    <h6 class="mb-0 fw-bold">{{
+                                        appt.patient.user.full_name|default:appt.patient.user.username }}</h6>
+                                    <small class="text-muted">PID: #{{ appt.patient.pk }}</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2"
+                                            style="width: 32px; height: 32px;">
+                                            <i class="bi bi-person-badge-fill text-primary small"></i>
+                                        </div>
+                                        <span class="small fw-bold">{{ appt.doctor }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge {{ appt.status }}">
+                                        {{ appt.status|title }}
+                                    </span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <button class="btn btn-sm btn-light rounded-pill px-3 fw-bold">Logs</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-journal-x fs-1 text-muted opacity-25 d-block mb-3"></i>
+                        <p class="text-muted fw-medium">No system-wide appointments recorded.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

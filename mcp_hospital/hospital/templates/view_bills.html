@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing & Invoices - AVM Hospital{% endblock %}
+{% block page_title %}Financial Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .billing-summary-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-badge.paid {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-badge.pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.cancelled {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .invoice-row {
+        transition: var(--transition);
+    }
+
+    .invoice-row:hover {
+        background-color: #f8fafc;
+    }
+
+    .amount-text {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .currency-symbol {
+        color: #64748b;
+        font-weight: 400;
+        margin-right: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-5">
+    <!-- Header info -->
+    <div class="col-lg-12">
+        <div class="card-custom p-4 bg-white border-0 shadow-sm">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h3 class="fw-bold mb-1 text-dark">Hospital Billing Ledger</h3>
+                    <p class="text-muted mb-0">Track all financial transactions, invoices, and payment statuses.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary border-2 rounded-pill px-4 fw-bold small">
+                        <i class="bi bi-download me-2"></i> Export All
+                    </button>
+                    <button class="btn btn-primary btn-premium px-4">
+                        <i class="bi bi-plus-lg me-2"></i> Create Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-custom shadow-sm border-0 bg-white">
+            <div class="card-header-custom bg-transparent border-0 pt-4 px-4">
+                <h5 class="fw-bold mb-0 text-dark">Invoice History</h5>
+            </div>
+            <div class="card-body p-0 mt-3">
+                <div class="table-responsive">
+                    {% if bills %}
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 text-uppercase small fw-bold text-muted border-0">Date Issued</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Patient & Details</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Description</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Total Amount</th>
+                                <th class="text-uppercase small fw-bold text-muted border-0">Status</th>
+                                <th class="pe-4 text-end text-uppercase small fw-bold text-muted border-0">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bill in bills %}
+                            <tr class="invoice-row">
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ bill.date_issued|date:"M d, Y" }}</div>
+                                    <small class="text-muted">{{ bill.date_issued|time:"H:i" }}</small>
+                                </td>
+                                <td>
+                                    <h6 class="mb-0 fw-bold">
+                                        {{ bill.patient.user.full_name|default:bill.patient.user.username }}</h6>
+                                    <small class="text-muted">PID: #{{ bill.patient.pk }}</small>
+                                </td>
+                                <td>
+                                    <div class="text-dark small fw-medium">{{ bill.description|truncatechars:40 }}</div>
+                                </td>
+                                <td>
+                                    <span class="amount-text fs-5">
+                                        <span class="currency-symbol">$</span>{{ bill.amount }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge {{ bill.status }}">
+                                        {{ bill.status|title }}
+                                    </span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-light rounded-pill px-3 fw-bold">View</button>
+                                        <button class="btn btn-sm btn-light rounded-circle ms-1"><i
+                                                class="bi bi-printer"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-receipt-cutoff fs-1 text-muted opacity-25 d-block mb-3"></i>
+                        <p class="text-muted fw-medium">No billing records found in the system.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

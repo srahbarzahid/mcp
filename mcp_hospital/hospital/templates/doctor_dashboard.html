@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard - AVM Hospital{% endblock %}
+{% block page_title %}Doctor Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-radius: 20px;
+        padding: 25px;
+        color: white;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-card.blue {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    }
+
+    .stat-card.green {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .stat-card.purple {
+        background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    }
+
+    /* Modern Table/Row-Card Design */
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+
+    .table-custom tr {
+        background-color: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .table-custom tr:hover {
+        transform: scale(1.01);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        z-index: 10;
+        position: relative;
+    }
+
+    .table-custom td {
+        border: none !important;
+        padding: 20px 0;
+    }
+
+    .table-custom td:first-child {
+        border-radius: 16px 0 0 16px;
+    }
+
+    .table-custom td:last-child {
+        border-radius: 0 16px 16px 0;
+    }
+
+    /* Advanced Clinical Actions */
+    .btn-action {
+        border: none;
+        border-radius: 12px;
+        padding: 8px 18px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .btn-rx {
+        background: rgba(124, 58, 237, 0.1);
+        color: #7c3aed;
+    }
+
+    .btn-rx:hover {
+        background: #7c3aed;
+        color: white;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-lab {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .btn-lab:hover {
+        background: #f59e0b;
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-report {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .btn-report:hover {
+        background: #ef4444;
+        color: white;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge.pending {
+        background: #fffbeb;
+        color: #d97706;
+    }
+
+    .status-badge.confirmed {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .status-badge.completed {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .status-badge.cancelled {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .table-custom thead th {
+        background-color: #f8fafc;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        font-weight: 700;
+        color: #64748b;
+        border-top: none;
+    }
+
+    .btn-status-group .btn {
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .btn-status-group .btn-success {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .btn-status-group .btn-warning {
+        background: #fffbeb;
+        color: #d97706;
+    }
+
+    .btn-status-group .btn-danger {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .btn-status-group .btn:hover {
+        transform: scale(1.1);
+        filter: brightness(0.95);
+    }
+
+    /* Patient Info Hover Clarity */
+    .patient-row {
+        transition: all 0.3s ease;
+    }
+
+    .patient-row:hover .patient-avatar {
+        background-color: #4f46e5 !important;
+        transform: rotate(10deg);
+    }
+
+    .patient-row:hover .patient-avatar i {
+        color: white !important;
+    }
+
+    .patient-row:hover .patient-name {
+        color: #4f46e5 !important;
+    }
+
+    .patient-row:hover {
+        background-color: #f8fafc !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-5">
+    <!-- Welcome Card -->
+    <div class="col-lg-12">
+        <div class="card-custom p-4 bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="fw-bold mb-1">Welcome back, Dr.
+                        {{ request.user.full_name|default:request.user.username }}!</h2>
+                    <p class="text-muted mb-0">You have appointments today. Here is your daily overview.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="{% url 'ward_status' %}" class="btn-premium btn-premium-primary">
+                        <i class="bi bi-door-open me-2"></i> Ward Management
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-md-4">
+        <div class="stat-card blue shadow-sm">
+            <div>
+                <i class="bi bi-calendar-check fs-1 opacity-50"></i>
+                <h3 class="fw-bold mt-2">{{ appointments|length }}</h3>
+                <p class="mb-0">Today's Appointments</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card green shadow-sm">
+            <div>
+                <i class="bi bi-person-heart fs-1 opacity-50"></i>
+                <h3 class="fw-bold mt-2">Specialist</h3>
+                <p class="mb-0">{{ doctor.specialization|default:"General Medicine" }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card purple shadow-sm">
+            <div>
+                <i class="bi bi-building fs-1 opacity-50"></i>
+                <h3 class="fw-bold mt-2">{{ doctor.department.name|default:"OPD" }}</h3>
+                <p class="mb-0">Department</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-custom shadow-sm">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <span>Recent Appointments</span>
+                <a href="{% url 'all_doctor_appointments' %}" class="btn btn-sm btn-light rounded-pill px-3 fw-bold">
+                    View All <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-custom mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Queue Pos.</th>
+                                <th>Patient Information</th>
+                                <th>Appt. Schedule</th>
+                                <th>State</th>
+                                <th>Clinical Actions</th>
+                                <th>Ward/Bed</th>
+                                <th class="pe-4 text-end">Quick Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in appointments %}
+                            <tr class="patient-row">
+                                <td class="ps-4">
+                                    <div class="h3 fw-bold text-primary mb-0">#{{ appt.token_number|default:"--" }}
+                                    </div>
+                                    <small class="text-muted text-uppercase fw-bold"
+                                        style="font-size: 0.6rem;">Token</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="patient-avatar rounded-circle bg-light d-flex align-items-center justify-content-center me-3"
+                                            style="width: 40px; height: 40px; transition: all 0.3s ease;">
+                                            <i class="bi bi-person text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="patient-name mb-0 fw-bold fs-5 text-dark transition-all">
+                                                {{ appt.patient.user.full_name|default:appt.patient.user.username }}
+                                            </h6>
+                                            <span
+                                                class="badge bg-secondary-subtle text-secondary rounded-pill small">PID:
+                                                #{{ appt.patient.pk }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ appt.time }}</div>
+                                    <small class="text-muted">{{ appt.date }}</small>
+                                </td>
+                                <td>
+                                    <span class="status-badge {{ appt.status }}">
+                                        {% if appt.status == 'completed' %}Consulted
+                                        {% elif appt.status == 'cancelled' %}Terminated
+                                        {% elif appt.status == 'confirmed' %}Confirmed
+                                        {% else %}{{ appt.status|title }}{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'add_prescription' appt.pk %}" class="btn-action btn-rx">
+                                            <i class="bi bi-plus-circle"></i> Rx
+                                        </a>
+                                        <a href="{% url 'request_lab_test' appt.pk %}" class="btn-action btn-lab">
+                                            <i class="bi bi-capsule"></i> Lab
+                                        </a>
+                                        {% for report in appt.lab_requests.all %}
+                                        {% if report.report_file %}
+                                        <a href="{{ report.report_file.url }}" target="_blank"
+                                            class="btn-action btn-report" title="View Lab Report">
+                                            <i class="bi bi-file-earmark-pdf"></i> Report
+                                        </a>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if appt.patient.assigned_bed %}
+                                    <div class="d-flex align-items-center text-success fw-bold small">
+                                        <i class="bi bi-hospital me-2"></i>
+                                        {{ appt.patient.assigned_bed.ward.name }}:
+                                        {{ appt.patient.assigned_bed.bed_number }}
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted small italic">No Bed Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="d-flex justify-content-end gap-2 align-items-center">
+                                        {% if appt.status != 'completed' %}
+                                        <div class="d-flex justify-content-end gap-2 btn-status-group">
+                                            <form method="POST" action="{% url 'update_appointment_status' %}"
+                                                class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="appointment_id" value="{{ appt.pk }}">
+                                                <input type="hidden" name="new_status" value="completed">
+                                                <button type="submit" class="btn btn-sm btn-success rounded-circle"
+                                                    title="Mark as Success (Completed)">
+                                                    <i class="bi bi-check-all"></i>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{% url 'update_appointment_status' %}"
+                                                class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="appointment_id" value="{{ appt.pk }}">
+                                                <input type="hidden" name="new_status" value="pending">
+                                                <button type="submit" class="btn btn-sm btn-warning rounded-circle"
+                                                    title="Mark as Pending">
+                                                    <i class="bi bi-clock-history fs-6"></i>
+                                                </button>
+                                            </form>
+
+                                            <form method="POST" action="{% url 'update_appointment_status' %}"
+                                                class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="appointment_id" value="{{ appt.pk }}">
+                                                <input type="hidden" name="new_status" value="cancelled">
+                                                <button type="submit" class="btn btn-sm btn-danger rounded-circle"
+                                                    title="Cancel Appointment">
+                                                    <i class="bi bi-x-circle fs-6"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="vr mx-1 opacity-25"></div>
+                                        {% endif %}
+
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm btn-light rounded-pill" type="button"
+                                                data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4">
+                                                <li class="px-3 py-2">
+                                                    <form method="POST" action="{% url 'allocate_bed' %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="patient_id"
+                                                            value="{{ appt.patient.pk }}">
+                                                        <label class="small fw-bold text-muted mb-1">
+                                                            {% if appt.patient.assigned_bed %}
+                                                            Re-allocate{% else %}Allocate Bed{% endif %}</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <select name="ward_type"
+                                                                class="form-select border-0 bg-light">
+                                                                <option value="general">General</option>
+                                                                <option value="private">Private</option>
+                                                                <option value="icu">ICU</option>
+                                                            </select>
+                                                            <button type="submit" class="btn btn-primary"><i
+                                                                    class="bi bi-plus"></i></button>
+                                                        </div>
+                                                    </form>
+                                                </li>
+                                                {% if appt.patient.assigned_bed %}
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{% url 'discharge_patient' %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="patient_id"
+                                                            value="{{ appt.patient.pk }}">
+                                                        <button type="submit"
+                                                            class="dropdown-item text-warning fw-bold">
+                                                            <i class="bi bi-door-open me-2"></i> Discharge Patient
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="bi bi-calendar-x fs-1 text-muted d-block mb-3"></i>
+                                    <p class="text-muted">No appointments found for today.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

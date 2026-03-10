@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}All Appointments - Dr. {{ request.user.full_name|default:request.user.username }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-0">Appointments History</h1>
+            <p class="text-muted">A comprehensive record of all your patient consultations.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'export_doctor_appointments_csv' %}" class="btn btn-success rounded-pill px-4 shadow-sm">
+                <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export to Excel
+            </a>
+            <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0"
+                    style="border-collapse: separate; border-spacing: 0;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold">Token</th>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold">Patient Information</th>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold">Schedule</th>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold">Status</th>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold">Medication</th>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold">Lab Results</th>
+                            <th class="px-3 py-3 text-muted text-uppercase small fw-bold text-end">Ward / Bed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                        <tr class="border-bottom">
+                            <td class="px-3 py-4">
+                                <span class="h5 fw-bold text-primary">#{{ appt.token_number|default:"--" }}</span>
+                            </td>
+                            <td class="px-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center me-2"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person-fill text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.95rem;">
+                                            {{ appt.patient.user.full_name|default:appt.patient.user.username }}</h6>
+                                        <span class="text-muted small">PID: #{{ appt.patient.pk }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-3">
+                                <div class="fw-bold text-dark small">{{ appt.time }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ appt.date }}</div>
+                            </td>
+                            <td class="px-3">
+                                <div class="dropdown">
+                                    <span class="badge rounded-pill px-2 py-1 small cursor-pointer dropdown-toggle
+                                        {% if appt.status == 'completed' %}bg-success-subtle text-success
+                                        {% elif appt.status == 'pending' %}bg-warning-subtle text-warning
+                                        {% elif appt.status == 'cancelled' %}bg-danger-subtle text-danger
+                                        {% else %}bg-primary-subtle text-primary{% endif %}" data-bs-toggle="dropdown"
+                                        {% if appt.status == 'completed' or appt.status == 'cancelled' %}
+                                        style="pointer-events: none;" {% endif %}>
+                                        {% if appt.status == 'completed' %}Consulted
+                                        {% elif appt.status == 'cancelled' %}Terminated
+                                        {% else %}{{ appt.status|title }}{% endif %}
+                                    </span>
+                                    {% if appt.status != 'completed' and appt.status != 'cancelled' %}
+                                    <ul class="dropdown-menu shadow border-0 rounded-3">
+                                        <li>
+                                            <h6 class="dropdown-header">Update Status</h6>
+                                        </li>
+                                        <li>
+                                            <form action="{% url 'update_appointment_status' %}" method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="appointment_id" value="{{ appt.id }}">
+                                                <button type="submit" name="status" value="completed"
+                                                    class="dropdown-item text-success">
+                                                    <i class="bi bi-check-circle me-2"></i> Consulted
+                                                </button>
+                                            </form>
+                                        </li>
+                                        <li>
+                                            <form action="{% url 'update_appointment_status' %}" method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="appointment_id" value="{{ appt.id }}">
+                                                <button type="submit" name="status" value="cancelled"
+                                                    class="dropdown-item text-danger">
+                                                    <i class="bi bi-x-circle me-2"></i> Terminate
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-3">
+                                {% if appt.prescription %}
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <a href="{% url 'prescription_detail' appt.prescription.pk %}"
+                                            class="btn btn-sm btn-outline-info rounded-pill px-3 py-1 fw-bold shadow-sm"
+                                            title="View details of generated prescription">
+                                            Rx
+                                        </a>
+                                    </div>
+                                    {% if appt.prescription.is_dispensed %}
+                                    <span
+                                        class="badge bg-success-subtle text-success rounded-pill small align-self-start border border-success-subtle"
+                                        style="font-size: 0.6rem;">
+                                        Dispensed
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <a href="{% url 'add_prescription' appt.pk %}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold shadow-sm"
+                                    style="font-size: 0.75rem;">
+                                    <i class="bi bi-plus-circle me-1"></i> Add Rx
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td class="px-3">
+                                <div class="d-flex flex-wrap gap-1 align-items-center">
+                                    {% for lr in appt.lab_requests.all %}
+                                    {% if lr.report_file %}
+                                    <a href="{{ lr.report_file.url }}" target="_blank"
+                                        class="badge bg-success text-decoration-none rounded-pill small d-flex align-items-center gap-1"
+                                        title="View Report">
+                                        <i class="bi bi-file-earmark-pdf"></i> Report
+                                    </a>
+                                    {% else %}
+                                    <span
+                                        class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill small"
+                                        title="{{ lr.status|title }}">
+                                        <i class="bi bi-hourglass-split"></i> {{ lr.status|title }}
+                                    </span>
+                                    {% endif %}
+                                    {% empty %}
+                                    <a href="{% url 'request_lab_test' appt.pk %}"
+                                        class="btn btn-sm btn-outline-warning rounded-pill px-2 py-0 fw-bold"
+                                        style="font-size: 0.7rem;">
+                                        Request
+                                    </a>
+                                    {% endfor %}
+                                    {% if appt.lab_requests.exists %}
+                                    <a href="{% url 'request_lab_test' appt.pk %}"
+                                        class="btn btn-sm btn-light border rounded-circle p-1" title="Add Lab"
+                                        style="width: 24px; height: 24px; line-height: 1;">
+                                        <i class="bi bi-plus small"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-3 text-end">
+                                {% if appt.patient.assigned_bed %}
+                                <div class="d-flex flex-column text-secondary small">
+                                    <span class="fw-bold">{{ appt.patient.assigned_bed.ward.name }}</span>
+                                    <span>Bed: {{ appt.patient.assigned_bed.bed_number }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted small">OPD</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="bi bi-calendar-x fs-1 text-muted opacity-25 d-block mb-3"></i>
+                                <h5 class="text-muted">No appointments found.</h5>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .btn-success {
+        background-color: #10b981;
+        border-color: #10b981;
+    }
+
+    .btn-success:hover {
+        background-color: #059669;
+        border-color: #059669;
+    }
+</style>
+{% endblock %}

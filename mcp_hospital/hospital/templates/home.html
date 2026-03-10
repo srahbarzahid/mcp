@@ -1,0 +1,841 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVM Hospital - Modern Medical Clinic</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts (Plus Jakarta Sans for ultra-modern look) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary: #0f172a;
+            --accent: #38bdf8;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 32px;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px -3px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --glow: 0 0 40px rgba(37, 99, 235, 0.2);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ----- NAVBAR ----- */
+        .navbar-custom {
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar-custom.scrolled {
+            padding: 12px 0;
+            box-shadow: var(--shadow-sm);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.8rem;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main) !important;
+            margin: 0 12px;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: var(--primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary) !important;
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white) !important;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            z-index: -1;
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        .btn-premium:hover::before {
+            opacity: 1;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-outline-premium {
+            background: transparent;
+            color: var(--secondary) !important;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 10px 26px;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .btn-outline-premium:hover {
+            border-color: var(--primary);
+            color: var(--primary) !important;
+            background: var(--primary-light);
+        }
+
+        /* ----- HERO SECTION ----- */
+        .hero {
+            position: relative;
+            padding: 180px 0 120px;
+            background: var(--white);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -5%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: 0;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .badge-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-premium i {
+            font-size: 1.1rem;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1.5px;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 40px;
+            max-width: 540px;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            z-index: 10;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            box-shadow: var(--shadow-lg), var(--glow);
+            border: 1px solid rgba(255,255,255,0.5);
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: var(--transition);
+        }
+
+        .hero-image-wrapper:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+
+        .hero-img-inner {
+            background: #e2e8f0;
+            border-radius: var(--radius-md);
+            height: 500px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-img-placeholder {
+            font-size: 8rem;
+            color: var(--white);
+            opacity: 0.7;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Floating Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            position: absolute;
+            z-index: 20;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .card-1 {
+            bottom: -30px;
+            left: -30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-2 {
+            top: 40px;
+            right: -30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation-delay: 2s;
+        }
+
+        .glass-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* ----- FEATURES ----- */
+        .features-section {
+            padding: 100px 0;
+            background: var(--bg-light);
+            position: relative;
+        }
+
+        .feature-box {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 40px 30px;
+            height: 100%;
+            transition: var(--transition);
+            border: 1px solid #f1f5f9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-md);
+            border-color: transparent;
+        }
+
+        .feature-box:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon-wrapper {
+            width: 65px;
+            height: 65px;
+            border-radius: 20px;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .feature-box:hover .feature-icon-wrapper {
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        /* ----- MODERN STATS ----- */
+        .stats-wrapper {
+            background: var(--secondary);
+            border-radius: var(--radius-lg);
+            padding: 60px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            margin-top: -60px;
+            z-index: 30;
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
+        }
+
+        .stats-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="2" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23dots)"/></svg>');
+            pointer-events: none;
+        }
+        
+        .stat-item {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-num {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ----- CTA SECTION ----- */
+        .cta-section {
+            padding: 120px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            color: var(--white);
+        }
+        
+        .cta-shape {
+            position: absolute;
+            opacity: 0.1;
+            background: var(--white);
+            border-radius: 50%;
+        }
+
+        .cta-shape-1 { width: 300px; height: 300px; top: -100px; left: -100px; }
+        .cta-shape-2 { width: 400px; height: 400px; bottom: -150px; right: -100px; }
+
+        .cta-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .btn-white {
+            background: var(--white);
+            color: var(--primary) !important;
+            border-radius: 50px;
+            padding: 15px 36px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: inline-block;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        /* ----- FOOTER ----- */
+        .footer {
+            background: var(--secondary);
+            color: #94a3b8;
+            padding: 80px 0 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer h5 {
+            color: var(--white);
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            margin-right: 10px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 30px;
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .hero-title { font-size: 3rem; }
+            .hero { padding: 140px 0 80px; }
+            .stats-wrapper { margin-top: 30px; padding: 40px; }
+            .stat-num { font-size: 2.5rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .card-1 { left: 0; }
+            .card-2 { right: 0; }
+            .glass-card { padding: 12px; }
+            .cta-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom" id="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-heart-pulse-fill brand-icon"></i> 
+                <span>AVM Hospital<span class="text-primary">.</span></span>
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list fs-1 text-dark"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-premium">Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-premium">Sign In</a>
+                        <a href="{% url 'signup' %}" class="btn btn-premium">Get Started</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="badge-premium">
+                        <i class="bi bi-stars"></i> Next Generation Clinic
+                    </div>
+                    <h1 class="hero-title">
+                        Advanced Care for a <br />
+                        <span class="text-gradient">Healthier Tomorrow</span>
+                    </h1>
+                    <p class="hero-desc">
+                        Experience medical excellence combined with compassionate care and cutting-edge digital health integration. Your wellbeing is our priority.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 mt-4">
+                        <a href="{% url 'signup' %}" class="btn btn-premium" style="padding: 16px 36px; font-size: 1.1rem;">
+                            Book Appointment <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                        <div class="d-flex align-items-center ms-lg-3 gap-3">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; color: var(--primary); font-size: 1.2rem;">
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Emergency 24/7</div>
+                                <div style="font-weight: 800; color: #ffffff;">(+91) 9876 543 210</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 mt-5 mt-lg-0" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                    <div class="hero-image-wrapper">
+                        <div class="hero-img-inner">
+                            <i class="bi bi-hospital hero-img-placeholder"></i>
+                        </div>
+                        
+                        <!-- Floating Cards -->
+                        <div class="glass-card card-1">
+                            <div class="glass-icon"><i class="bi bi-shield-check"></i></div>
+                            <div>
+                                <div style="font-weight: 800; color: var(--secondary);">Top Certified</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Medical Experts</div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card card-2">
+                            <div class="glass-icon"><i class="bi bi-heart-pulse"></i></div>
+                            <div>
+                                <div style="font-weight: 800; color: var(--secondary);">99.9%</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Success Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="row" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                <div class="col-12">
+                    <div class="stats-wrapper">
+                        <div class="row text-center text-md-start">
+                            <div class="col-md-3 col-6 mb-4 mb-md-0 stat-item">
+                                <div class="stat-num">8k<span style="color: var(--accent);">+</span></div>
+                                <div class="stat-label">Happy Patients</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-4 mb-md-0 stat-item">
+                                <div class="stat-num">150<span style="color: var(--accent);">+</span></div>
+                                <div class="stat-label">Expert Doctors</div>
+                            </div>
+                            <div class="col-md-3 col-6 stat-item">
+                                <div class="stat-num">15<span style="color: var(--accent);">+</span></div>
+                                <div class="stat-label">Years Exp.</div>
+                            </div>
+                            <div class="col-md-3 col-6 stat-item">
+                                <div class="stat-num">24<span style="color: var(--accent);">/</span>7</div>
+                                <div class="stat-label">Emergency</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="badge-premium mb-3">Healthcare Excellence</span>
+                <h2 style="font-size: 2.8rem; font-weight: 800; color: var(--secondary);">Why Choose Us</h2>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto; font-size: 1.1rem;">Delivering premium healthcare solutions through innovation, expertise, and personalized medical attention.</p>
+            </div>
+
+            <div class="row g-4" id="services">
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-capsule"></i>
+                        </div>
+                        <h3 class="feature-title">Modern Pharmacy</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6;">Integrated pharmaceutical services ensuring immediate access to prescribed medications with automated tracking.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper" style="color: #10b981;">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                        <h3 class="feature-title">Advanced Labs</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6;">State-of-the-art diagnostic facilities providing rapid, accurate results directly to your digital portfolio.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper" style="color: #8b5cf6;">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h3 class="feature-title">Smart Scheduling</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6;">Zero-wait times. Our predictive algorithm optimally schedules appointments managing your time perfectly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call To Action -->
+    <section class="cta-section" id="contact">
+        <div class="cta-shape cta-shape-1"></div>
+        <div class="cta-shape cta-shape-2"></div>
+        <div class="container position-relative z-10" data-aos="zoom-in">
+            <h2 class="cta-title">Ready to Experience Better Healthcare?</h2>
+            <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto; opacity: 0.9;">Join thousands of patients who trust us with their health. Register today and book your first appointment instantly.</p>
+            <a href="{% url 'signup' %}" class="btn-white text-decoration-none">
+                Create Your Profile Now <i class="bi bi-arrow-right-circle-fill ms-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-5 pe-lg-5">
+                    <a href="#" class="text-decoration-none footer-logo">
+                        <i class="bi bi-heart-pulse-fill text-primary"></i> AVM Hospital.
+                    </a>
+                    <p style="line-height: 1.8; margin-bottom: 25px;">Pioneering the future of digital healthcare through a unified platform connecting patients, doctors, and diagnostic labs.</p>
+                    <div class="contact-info mt-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; color: var(--primary);">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <span style="font-size: 0.95rem; color: #f8fafc;">Fathimagiri Rd, Chandakunnu, Nilambur, Kerala 679329</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; color: var(--primary);">
+                                <i class="bi bi-telephone-fill"></i>
+                            </div>
+                            <span style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">(+91) 9876 543 210</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-5">
+                    <h5 class="mb-3">Find Us Here</h5>
+                    <div style="border-radius: 12px; overflow: hidden; height: 200px; border: 2px solid rgba(255,255,255,0.1);">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15655.882193563457!2d76.2232!3d11.2723!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba631abcb3ce16b%3A0xeab66a0d2495d465!2sFathimagiri%20Rd%2C%20Chandakunnu%2C%20Nilambur%2C%20Kerala%20679329!5e0!3m2!1sen!2sin!4v1715456391456!5m2!1sen!2sin" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; filter: grayscale(10%) contrast(1.1);" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2">
+                    <h5>Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2026 AVM Hospital Medical. All Rights Reserved. Designed with <i class="bi bi-heart-fill text-danger"></i> for better care.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation Library JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        // Initialize Animations
+        AOS.init({
+            once: true,
+            offset: 50,
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', function() {
+            var navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    background:#f5fafa;
+    color:#333;
+}
+
+/* NAVBAR */
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 8%;
+    background:white;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:600;
+    color:#1bb7a5;
+}
+
+.logo span{
+    color:#333;
+}
+
+nav a{
+    margin-left:25px;
+    text-decoration:none;
+    color:#555;
+    font-size:14px;
+    font-weight:500;
+}
+
+nav a:hover{
+    color:#1bb7a5;
+}
+
+/* HERO */
+.hero{
+    height:85vh;
+    background:linear-gradient(rgba(27,183,165,0.6),rgba(27,183,165,0.6)),
+    url("https://images.unsplash.com/photo-1582750433449-648ed127bb54") no-repeat center/cover;
+    display:flex;
+    align-items:center;
+    padding:0 8%;
+    color:white;
+}
+
+.hero-text h1{
+    font-size:48px;
+    font-weight:600;
+}
+
+.hero-text p{
+    margin:15px 0;
+    font-size:16px;
+}
+
+.hero button{
+    padding:12px 25px;
+    border:none;
+    background:white;
+    color:#1bb7a5;
+    font-weight:600;
+    border-radius:4px;
+    cursor:pointer;
+}
+
+.hero button:hover{
+    background:#e0f7f4;
+}
+
+/* FEATURES */
+.features{
+    padding:60px 8%;
+    text-align:center;
+    background:white;
+}
+
+.features h2{
+    margin-bottom:40px;
+    font-size:26px;
+    font-weight:600;
+}
+
+.feature-box{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+}
+
+.card{
+    flex:1;
+    padding:25px;
+    background:#f5fafa;
+    border-radius:8px;
+}
+
+.card h3{
+    color:#1bb7a5;
+    margin-bottom:10px;
+}
+
+/* ABOUT */
+.about{
+    padding:60px 8%;
+    display:flex;
+    gap:40px;
+}
+
+.about-left{
+    flex:1;
+}
+
+.about-right{
+    flex:1;
+    display:flex;
+    gap:20px;
+}
+
+.box{
+    background:#f5fafa;
+    padding:25px;
+    border-radius:8px;
+    flex:1;
+}
+
+.contact{
+    background:#1bb7a5;
+    color:white;
+}
+
+/* CTA */
+.cta{
+    background:#1bb7a5;
+    padding:40px;
+    text-align:center;
+    color:white;
+}
+
+.cta button{
+    margin-top:15px;
+    padding:10px 25px;
+    border:none;
+    background:white;
+    color:#1bb7a5;
+    font-weight:600;
+    border-radius:4px;
+    cursor:pointer;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    background:#f0f0f0;
+font-size:14px;}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Incoming Prescriptions - AVM Hospital{% endblock %}
+{% block page_title %}Pharmacy Orders{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-card {
+        border-radius: 20px;
+        border: none;
+        background: white;
+        transition: var(--transition);
+        border-left: 6px solid #8b5cf6;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .order-id {
+        font-size: 0.75rem;
+        background: #f5f3ff;
+        color: #7c3aed;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-lg-12">
+        <div class="card-custom p-4 bg-white border-0 shadow-sm">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h3 class="fw-bold mb-1 text-dark">Prescription Queue</h3>
+                    <p class="text-muted mb-0">Review and dispense medications based on doctor prescriptions.</p>
+                </div>
+                <a href="{% url 'pharmacy_dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold">
+                    <i class="bi bi-box-seam me-2"></i> Inventory Manager
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for p in prescriptions %}
+    <div class="col-md-6 col-xl-4">
+        <div class="order-card p-4 shadow-sm h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="order-id">#RX-{{ p.pk }}</span>
+                <span class="text-muted small fw-bold">{{ p.date_created|date:"M d, Y" }}</span>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-1">{{ p.patient.user.full_name|default:p.patient.user.username }}</h5>
+            <p class="text-muted small mb-4">
+                <i class="bi bi-person-badge me-1"></i> Dr. {{ p.doctor.user.full_name|default:p.doctor.user.username }}
+            </p>
+
+            <div class="mt-auto pt-3 border-top">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-primary fw-bold small">
+                        <i class="bi bi-clock-history me-1"></i> {{ p.date_created|timesince }} ago
+                    </div>
+                    <a href="{% url 'prescription_detail' p.pk %}"
+                        class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm">
+                        View & Dispense
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="bg-white p-5 rounded-5 shadow-sm inline-block">
+            <i class="bi bi-receipt-cutoff fs-1 text-muted opacity-25 d-block mb-3"></i>
+            <h4 class="text-dark fw-bold">No active prescriptions</h4>
+            <p class="text-muted">New prescriptions from doctors will appear here automatically.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

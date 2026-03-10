@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Prescription - AVM Hospital{% endblock %}
+{% block page_title %}Patient Prescription{% endblock %}
+
+{% block extra_css %}
+<style>
+    .prescription-card {
+        border-radius: 24px;
+        background: white;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .patient-summary {
+        background: #f8fafc;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .medicine-item {
+        background: #ffffff;
+        border: 2px solid #f1f5f9;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .medicine-item:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05);
+    }
+
+    .btn-remove-med {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fee2e2;
+        color: #ef4444;
+        border: none;
+        font-size: 1.2rem;
+        transition: var(--transition);
+    }
+
+    .btn-remove-med:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    .add-med-btn {
+        border: 2px dashed #cbd5e1;
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 700;
+        padding: 15px;
+        border-radius: 16px;
+        width: 100%;
+        transition: var(--transition);
+    }
+
+    .add-med-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: #eff6ff;
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-section-title i {
+        margin-right: 10px;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="prescription-card p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark mb-0">Clinical Prescription</h2>
+                <a href="{% url 'dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold">
+                    <i class="bi bi-arrow-left me-2"></i> Cancel
+                </a>
+            </div>
+
+            <!-- Patient Quick Info -->
+            <div class="patient-summary mb-5">
+                <div class="row g-4 text-center text-md-start">
+                    <div class="col-md-4">
+                        <label class="info-label">Patient Name</label>
+                        <div class="fw-bold text-dark fs-5">{{ patient.name }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="info-label">Basic Info</label>
+                        <div class="fw-bold text-dark fs-5">{{ patient.age }} Years | {{ patient.gender|default:"N/A" }}
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="info-label">Reference / Mobile</label>
+                        <div class="fw-bold text-dark fs-5"><i class="bi bi-telephone me-2"></i> {{ patient.mobile }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" id="prescriptionForm">
+                {% csrf_token %}
+
+                <!-- Medicines Section -->
+                <div class="mb-5">
+                    <div class="form-section-title">
+                        <i class="bi bi-capsule"></i> Medication Details
+                    </div>
+
+                    <div id="medicine-container">
+                        {% if prescription and prescription.medicines %}
+                        {% for med in prescription.medicines %}
+                        <div class="medicine-item">
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold small">Medicine Name</label>
+                                    <input type="text" name="medicine_name[]" class="form-control"
+                                        placeholder="e.g. Amoxicillin" value="{{ med.name }}" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold small">Dosage & Frequency</label>
+                                    <input type="text" name="medicine_dosage[]" class="form-control"
+                                        placeholder="500mg, 1-0-1 after food" value="{{ med.dosage }}" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold small">Qty</label>
+                                    <input type="number" name="medicine_quantity[]" class="form-control"
+                                        value="{{ med.quantity|default:10 }}" min="1" required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-remove-med" onclick="removeMed(this)" {% if forloop.first
+                                %}style="display: none;" {% endif %}>&times;</button>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="medicine-item">
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold small">Medicine Name</label>
+                                    <input type="text" name="medicine_name[]" class="form-control"
+                                        placeholder="e.g. Amoxicillin" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold small">Dosage & Frequency</label>
+                                    <input type="text" name="medicine_dosage[]" class="form-control"
+                                        placeholder="500mg, 1-0-1 after food" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold small">Qty</label>
+                                    <input type="number" name="medicine_quantity[]" class="form-control" value="10"
+                                        min="1" required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-remove-med" onclick="removeMed(this)"
+                                style="display: none;">&times;</button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="button" class="add-med-btn mt-2" onclick="addMed()">
+                        <i class="bi bi-plus-circle me-2"></i> Add Another Medication
+                    </button>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="mb-5">
+                    <div class="form-section-title">
+                        <i class="bi bi-journal-text"></i> Clinical Notes & Diagnosis
+                    </div>
+                    <textarea name="notes" class="form-control" rows="5"
+                        placeholder="Enter findings, diagnostic observations, or special advice for the patient...">{{ prescription.notes|default:'' }}</textarea>
+                </div>
+
+                <!-- Submit -->
+                <div class="pt-4 border-top">
+                    <button type="submit" class="btn btn-primary btn-premium py-3 px-5 fw-bold fs-5">
+                        <i class="bi bi-file-earmark-check me-2"></i> {% if prescription %}Update & Resubmit{% else
+                        %}Finalize & Issue{% endif %} Prescription
+                    </button>
+                    <p class="text-muted small mt-3">
+                        <i class="bi bi-info-circle me-1"></i> Once {% if prescription %}updated{% else %}issued{% endif
+                        %}, the pharmacy will receive an instant
+                        notification for dispensing.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addMed() {
+        const container = document.getElementById('medicine-container');
+        const items = container.getElementsByClassName('medicine-item');
+        const newItem = items[0].cloneNode(true);
+
+        // Reset inputs
+        const inputs = newItem.getElementsByTagName('input');
+        for (let input of inputs) {
+            if (input.type === 'number') input.value = 1;
+            else input.value = '';
+        }
+
+        // Show remove button on secondary items
+        const removeBtn = newItem.querySelector('.btn-remove-med');
+        removeBtn.style.display = 'flex';
+
+        container.appendChild(newItem);
+    }
+
+    function removeMed(btn) {
+        btn.closest('.medicine-item').remove();
+    }
+</script>
+{% endblock %}
